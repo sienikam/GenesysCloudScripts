@@ -1,0 +1,2 @@
+Name;Division;Description;AlertingTimeoutSeconds;serviceLevel_percentage;ServiceLevel_DurationMs;ACWSettings_WrapupPrompt;ACWSettings_timeoutMs;SkillEvaluationMethod;CallingPartyNumber;CallingPartyName;QueueFlow;DefaultScripts
+testkamil;Demo;testkamil;12;0.8;60000;MANDATORY_TIMEOUT;1000;BEST;48123456789;GCDemo_Bot;Kamil
