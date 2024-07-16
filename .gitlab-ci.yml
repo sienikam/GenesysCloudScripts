@@ -1,0 +1,38 @@
+variables:
+  oauthclient_id:
+    description: "OAuthClient ID found on the OAuth page of Admin UI"
+  oauthclient_secret:
+    description: "OAuthClient secret found on the OAuth page of Admin UI"
+  environment:
+    description: "Environment override. E.g. mypurecloud.com.au or ap-southeast-2"
+    value: "mypurecloud.de"
+  script:
+    value: "ACDAutoAnswer"
+    options:
+      - "ACDAutoAnswer"
+      - "AssignUsersGroups"
+      - "RemoveUsersGroups"
+      - "AssignUsersQueues"
+      - "RemoveUsersQueues"
+      - "AssignUsersStations"
+      - "CreateQueues"
+      - "DeleteQueues"
+      - "UpdateQueues"
+      - "CreateSkills"
+      - "DeleteSkills"
+      - "CreateWrapUpCodes"
+      - "AssignWrapUpCodes"
+    description: "Available Genesys Cloud scripts"
+    
+image:
+  name: debian:bullseye
+
+gc:
+  stage: deploy
+  before_script:
+    - apt-get update -qq && apt-get install -qq -y curl jq > /dev/null
+    - curl -s https://sdk-cdn.mypurecloud.com/external/go-cli/linux/dl/install.sh | bash
+  script:
+    - bash $script.sh
+  only:
+   - web
