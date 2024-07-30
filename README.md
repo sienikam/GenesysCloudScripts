@@ -13,6 +13,6 @@
 | DeleteQueues | delete queues |
 | CreateSkills | create skills |
 | DeleteSkills | delete skills |
+| RemoveUserSkills | remove skills from users |
 | CreateWrapUpCodes | create wrap-up codes |
 | AssignWrapUpCodes | assign wrap-up codes into queues |
-| RemoveUserSkills | remove skills from users |
