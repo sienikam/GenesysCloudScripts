@@ -15,6 +15,7 @@ variables:
       - "AssignUsersQueues"
       - "RemoveUsersQueues"
       - "AssignUsersStations"
+      - "RemoveUserSkills"
       - "CreateQueues"
       - "DeleteQueues"
       - "UpdateQueues"
