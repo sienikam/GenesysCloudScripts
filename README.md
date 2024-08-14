@@ -7,6 +7,7 @@
 | RemoveUsersGroups | remove users from groups |
 | AssignUsersQueues | assign users into queues |
 | RemoveUsersQueues | remove users from queues |
+| GDPR_DeleteUser | permanently remove users from org via GDPR request |
 | AssignUsersStations | assign default phone to user |
 | CreateQueues | create queues |
 | UpdateQueues | update queues (CreateQueues.csv) |
