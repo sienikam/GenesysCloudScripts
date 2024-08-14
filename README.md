@@ -16,5 +16,3 @@
 | RemoveUserSkills | remove skills from users |
 | CreateWrapUpCodes | create wrap-up codes |
 | AssignWrapUpCodes | assign wrap-up codes into queues |
-
-Demo - https://www.youtube.com/watch?v=jmk6xwDA6oI

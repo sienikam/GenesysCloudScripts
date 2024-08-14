@@ -23,6 +23,7 @@ variables:
       - "DeleteSkills"
       - "CreateWrapUpCodes"
       - "AssignWrapUpCodes"
+      - "GDPR_DeleteUser"
     description: "Available Genesys Cloud scripts"
     
 image:
