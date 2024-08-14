@@ -14,7 +14,10 @@ do
   read line <<<$column6
   Berechtigungsgruppen=( $line )
   declare -p Berechtigungsgruppen
-  GroupID=`echo "${GroupsList}" | jq -r '.[] | select(.name == "'"$column4"'") | .id' | tr -d '\r'`
+  # case sensitive version
+  #GroupID=`echo "${GroupsList}" | jq -r '.[] | select(.name == "'"$column4"'") | .id' | tr -d '\r'`
+  # case insensitive version
+  GroupID=`echo "${GroupsList}" | jq -r '.[] | select(.name | test("'"^$column4$"'";"i")) | .id' | tr -d '\r'`
   if [ -z "$GroupID" ]
   then
         echo "CC SP GroupID: Group not found!"
@@ -34,7 +37,10 @@ do
         for value in "${Berechtigungsgruppen[@]}"
         do
           echo "Berechtigungsgruppen: $value"
-          GroupID=`gc groups list -a --clientid $oauthclient_id --clientsecret $oauthclient_secret --environment $environment | jq -r '.[] | select(.name == "'"$value"'") | .id' | tr -d '\r'`
+          # case sensitive version
+          #GroupID=`gc groups list -a --clientid $oauthclient_id --clientsecret $oauthclient_secret --environment $environment | jq -r '.[] | select(.name == "'"$value"'") | .id' | tr -d '\r'`
+          # case insensitive version
+          GroupID=`gc groups list -a --clientid $oauthclient_id --clientsecret $oauthclient_secret --environment $environment | jq -r '.[] | select(.name | test("'"^$value$"'";"i")) | .id' | tr -d '\r'`
           if [ -z "$GroupID" ]
           then
                 echo "BerechtigungsgruppenID: Group not found!"

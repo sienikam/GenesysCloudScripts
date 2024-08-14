@@ -7,7 +7,7 @@ QueuesList=`gc routing queues list -a --clientid $oauthclient_id --clientsecret 
 #!/bin/bash
 while IFS=";" read -r column1 column2 column3 column4 column5 column6 column7 column8 column9
 do
-  column4=`echo "$column4" | tr -d '\r'`
+  column4=`echo "$column4" | tr -d '\r' | tr '[:upper:]' '[:lower:]'`
   column9=`echo "$column9" | tr -d '\r'`
   echo "User: $column4"
   echo "Queues: $column9"
