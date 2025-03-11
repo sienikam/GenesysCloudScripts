@@ -1,0 +1,225 @@
+name: teamcloud/genesyscloudscripts
+on:
+  push:
+  workflow_dispatch:
+concurrency:
+  group: "${{ github.ref }}"
+  cancel-in-progress: true
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container:
+      image: sienikam/gccli:csvlint
+    if: github.event_type == 'workflow_dispatch'
+    timeout-minutes: 1440
+    env:
+      CI_DEBUG_TRACE: 'false'
+      oauthclient_id:
+        description: OAuthClient ID found on the OAuth page of Admin UI
+      oauthclient_secret:
+        description: OAuthClient secret found on the OAuth page of Admin UI
+      environment:
+        description: Environment override. E.g. mypurecloud.com.au or ap-southeast-2
+        value: mypurecloud.de
+      script:
+        value: ACDAutoAnswer
+        options:
+        - ArchitectCallFlowAssignDID
+        - ACDAutoAnswer
+        - AssignUserPhoneNumbers
+        - AssignUserPhoneNumbers_withDirectRouting
+        - AssignRolesGroups
+        - AssignUsersGroups
+        - RemoveUsersGroups
+        - AssignUsersQueues
+        - RemoveUsersQueues
+        - AssignUsersStations
+        - AssignUsersSkills
+        - RemoveUserSkills
+        - ChangeWebRTCNames
+        - CreateGroups
+        - CreateDivisions
+        - CreateQueues
+        - CreateSingleDIDRangesForPersonalHotlines
+        - DeleteAllExternalContacts
+        - DeleteUserPhoneNumbers
+        - DeleteQueues
+        - DeleteRecordings
+        - DeleteRecordingsFromDivision
+        - DeleteRecordingsFromQueue
+        - DeleteRecordingsPerUser
+        - UpdateQueues
+        - CreateSkills
+        - DeleteSkills
+        - CreateWrapUpCodes
+        - AssignWrapUpCodes
+        - GDPR_DeleteUser
+        - IntegrationAssignGroup
+        - ActivateUsersQueues
+        - DeactivateUsersQueues
+        - ListUsersPerDivision
+        - ListUsersPerGroup
+        - ListUsersPerQueue
+        description: Available Genesys Cloud scripts
+      backup:
+        value: 'false'
+        options:
+        - 'true'
+        - 'false'
+        description: Enable or disable the backup job. When enabled, it executes the backup process and stores related artifacts.
+    steps:
+    - uses: actions/checkout@v4.1.0
+      with:
+        fetch-depth: 20
+        lfs: true
+    - run: csvlint -delimiter=';' $script.csv
+  backup:
+    needs: test
+    runs-on: ubuntu-latest
+    container:
+      image: sienikam/gccli:csvlint
+    if: github.event_type == 'workflow_dispatch'
+    timeout-minutes: 1440
+    env:
+      CI_DEBUG_TRACE: 'false'
+      oauthclient_id:
+        description: OAuthClient ID found on the OAuth page of Admin UI
+      oauthclient_secret:
+        description: OAuthClient secret found on the OAuth page of Admin UI
+      environment:
+        description: Environment override. E.g. mypurecloud.com.au or ap-southeast-2
+        value: mypurecloud.de
+      script:
+        value: ACDAutoAnswer
+        options:
+        - ArchitectCallFlowAssignDID
+        - ACDAutoAnswer
+        - AssignUserPhoneNumbers
+        - AssignUserPhoneNumbers_withDirectRouting
+        - AssignRolesGroups
+        - AssignUsersGroups
+        - RemoveUsersGroups
+        - AssignUsersQueues
+        - RemoveUsersQueues
+        - AssignUsersStations
+        - AssignUsersSkills
+        - RemoveUserSkills
+        - ChangeWebRTCNames
+        - CreateGroups
+        - CreateDivisions
+        - CreateQueues
+        - CreateSingleDIDRangesForPersonalHotlines
+        - DeleteAllExternalContacts
+        - DeleteUserPhoneNumbers
+        - DeleteQueues
+        - DeleteRecordings
+        - DeleteRecordingsFromDivision
+        - DeleteRecordingsFromQueue
+        - DeleteRecordingsPerUser
+        - UpdateQueues
+        - CreateSkills
+        - DeleteSkills
+        - CreateWrapUpCodes
+        - AssignWrapUpCodes
+        - GDPR_DeleteUser
+        - IntegrationAssignGroup
+        - ActivateUsersQueues
+        - DeactivateUsersQueues
+        - ListUsersPerDivision
+        - ListUsersPerGroup
+        - ListUsersPerQueue
+        description: Available Genesys Cloud scripts
+      backup:
+        value: 'false'
+        options:
+        - 'true'
+        - 'false'
+        description: Enable or disable the backup job. When enabled, it executes the backup process and stores related artifacts.
+    steps:
+    - uses: actions/checkout@v4.1.0
+      with:
+        fetch-depth: 20
+        lfs: true
+    - run: echo "backup="$backup; if [ "$backup" == "true" ]; then echo "Backup enabled, executing backup job.."; bash Backup.sh; fi
+    - uses: actions/upload-artifact@v4.1.0
+      if: success()
+      with:
+        name: "${{ github.job }}"
+        path: "*.txt"
+  deploy:
+    needs: backup
+    runs-on: ubuntu-latest
+    container:
+      image: sienikam/gccli:csvlint
+    if: github.event_type == 'workflow_dispatch'
+    timeout-minutes: 1440
+    env:
+      CI_DEBUG_TRACE: 'false'
+      oauthclient_id:
+        description: OAuthClient ID found on the OAuth page of Admin UI
+      oauthclient_secret:
+        description: OAuthClient secret found on the OAuth page of Admin UI
+      environment:
+        description: Environment override. E.g. mypurecloud.com.au or ap-southeast-2
+        value: mypurecloud.de
+      script:
+        value: ACDAutoAnswer
+        options:
+        - ArchitectCallFlowAssignDID
+        - ACDAutoAnswer
+        - AssignUserPhoneNumbers
+        - AssignUserPhoneNumbers_withDirectRouting
+        - AssignRolesGroups
+        - AssignUsersGroups
+        - RemoveUsersGroups
+        - AssignUsersQueues
+        - RemoveUsersQueues
+        - AssignUsersStations
+        - AssignUsersSkills
+        - RemoveUserSkills
+        - ChangeWebRTCNames
+        - CreateGroups
+        - CreateDivisions
+        - CreateQueues
+        - CreateSingleDIDRangesForPersonalHotlines
+        - DeleteAllExternalContacts
+        - DeleteUserPhoneNumbers
+        - DeleteQueues
+        - DeleteRecordings
+        - DeleteRecordingsFromDivision
+        - DeleteRecordingsFromQueue
+        - DeleteRecordingsPerUser
+        - UpdateQueues
+        - CreateSkills
+        - DeleteSkills
+        - CreateWrapUpCodes
+        - AssignWrapUpCodes
+        - GDPR_DeleteUser
+        - IntegrationAssignGroup
+        - ActivateUsersQueues
+        - DeactivateUsersQueues
+        - ListUsersPerDivision
+        - ListUsersPerGroup
+        - ListUsersPerQueue
+        description: Available Genesys Cloud scripts
+      backup:
+        value: 'false'
+        options:
+        - 'true'
+        - 'false'
+        description: Enable or disable the backup job. When enabled, it executes the backup process and stores related artifacts.
+    steps:
+    - uses: actions/checkout@v4.1.0
+      with:
+        fetch-depth: 20
+        lfs: true
+    - uses: actions/download-artifact@v4.1.0
+    - run: bash $script.sh
+    - uses: actions/upload-artifact@v4.1.0
+      if: success()
+      with:
+        name: "${{ github.job }}"
+        path: |-
+          UsersPerDivision.csv
+          UsersPerGroup.csv
+          UsersPerQueue.csv
