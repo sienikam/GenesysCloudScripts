@@ -1,0 +1,4 @@
+Name;Description;Type;rulesVisible;visibility;rolesEnabled;owners
+GroupName_1;;official;TRUE;public;TRUE;owner@example.com
+GroupName_2;;official;TRUE;public;TRUE;owner@example.com
+GroupName_3;;official;TRUE;public;TRUE;owner@example.com

@@ -1,0 +1,3 @@
+Name;Division;Description;AlertingTimeoutSeconds;serviceLevel_percentage;ServiceLevel_DurationMs;ACWSettings_WrapupPrompt;ACWSettings_timeoutMs;SkillEvaluationMethod;CallingPartyNumber;CallingPartyName;QueueFlow;DefaultScripts
+QueueName_1;DivisionName;QueueName_1;16;0.8;60000;MANDATORY_TIMEOUT;15000;NONE;+49XXXXXXXXXX;+49XXXXXXXXXX;;ScriptName
+QueueName_2;DivisionName;QueueName_2;16;0.8;60000;MANDATORY_TIMEOUT;15000;NONE;+49YYYYYYYYY;+49YYYYYYYYY;;ScriptName

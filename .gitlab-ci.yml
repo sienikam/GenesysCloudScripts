@@ -1,0 +1,95 @@
+variables:
+  CI_DEBUG_TRACE: "false"
+  oauthclient_id:
+    description: "OAuthClient ID found on the OAuth page of Admin UI"
+  oauthclient_secret:
+    description: "OAuthClient secret found on the OAuth page of Admin UI"
+  environment:
+    description: "Environment override. E.g. mypurecloud.com.au or ap-southeast-2"
+    value: "mypurecloud.de"
+  script:
+    value: "ACDAutoAnswer"
+    options:
+      - "ArchitectCallFlowAssignDID"
+      - "ACDAutoAnswer"
+      - "AssignUserPhoneNumbers"
+      - "AssignUserPhoneNumbers_withDirectRouting"
+      - "AssignRolesGroups"
+      - "AssignUsersGroups"
+      - "RemoveUsersGroups"
+      - "AssignUsersQueues"
+      - "RemoveUsersQueues"
+      - "AssignUsersStations"
+      - "AssignUsersSkills"
+      - "RemoveUserSkills"
+      - "ChangeWebRTCNames"
+      - "CreateGroups"
+      - "CreateCannedResponses"
+      - "CreateDivisions"
+      - "CreateQueues"
+      - "CreateSingleDIDRangesForPersonalHotlines"
+      - "CreateDictionaryFeedback"
+      - "DeleteAllExternalContacts"
+      - "DeleteUserPhoneNumbers"
+      - "DeleteQueues"
+      - "DeleteRecordings"
+      - "DeleteRecordingsFromDivision"
+      - "DeleteRecordingsFromQueue"
+      - "DeleteRecordingsPerUser"
+      - "UpdateQueues"
+      - "CreateSkills"
+      - "DeleteSkills"
+      - "CreateWrapUpCodes"
+      - "AssignWrapUpCodes"
+      - "GDPR_DeleteUser"
+      - "IntegrationAssignGroup"
+      - "ActivateUsersQueues"
+      - "DeactivateUsersQueues"
+      - "ListUsersPerDivision"
+      - "ListUsersPerGroup"
+      - "ListUsersPerQueue"
+      - "ChangePhoneSite"
+    description: "Available Genesys Cloud scripts"
+  backup:
+    value: "false"
+    options:
+      - "true"
+      - "false"
+    description: "Enable or disable the backup job. When enabled, it executes the backup process and stores related artifacts."
+    
+image:
+  name: sienikam/gccli:csvlint
+
+stages:
+  - test
+  - backup
+  - deploy
+
+test:
+  stage: test
+  script:
+    - csvlint -lazyquotes -delimiter=';' $script.csv
+  only:
+   - web
+
+backup:
+  stage: backup
+  script:
+    - echo "backup="$backup; if [ "$backup" == "true" ]; then echo "Backup enabled, executing backup job.."; bash Backup.sh; fi
+  artifacts:
+    paths:
+      - "*.txt"
+  only:
+   - web  
+
+deploy:
+  stage: deploy
+  script:
+    - bash $script.sh
+  artifacts:
+    paths:
+      - "UsersPerDivision.csv"
+      - "UsersPerGroup.csv"
+      - "UsersPerQueue.csv"
+  only:
+   - web

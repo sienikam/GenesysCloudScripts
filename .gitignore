@@ -1,0 +1,6 @@
+.codex
+vscode/
+.vscode/settings.json
+setdevoauth.sh
+CLAUDE.md
+AGENTS.md

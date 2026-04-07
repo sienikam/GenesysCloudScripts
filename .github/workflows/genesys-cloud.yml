@@ -1,0 +1,192 @@
+name: Genesys Cloud Scripts
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_org:
+        description: "GitHub Environment representing the target Genesys Cloud org"
+        required: true
+        type: environment
+      script:
+        description: "Genesys Cloud script to execute"
+        required: true
+        type: choice
+        options:
+          - ArchitectCallFlowAssignDID
+          - ACDAutoAnswer
+          - AssignUserPhoneNumbers
+          - AssignUserPhoneNumbers_withDirectRouting
+          - AssignRolesGroups
+          - AssignUsersGroups
+          - RemoveUsersGroups
+          - AssignUsersQueues
+          - RemoveUsersQueues
+          - AssignUsersStations
+          - AssignUsersSkills
+          - RemoveUserSkills
+          - ChangeWebRTCNames
+          - CreateGroups
+          - CreateCannedResponses
+          - CreateDivisions
+          - CreateQueues
+          - CreateSingleDIDRangesForPersonalHotlines
+          - CreateDictionaryFeedback
+          - DeleteAllExternalContacts
+          - DeleteUserPhoneNumbers
+          - DeleteQueues
+          - DeleteRecordings
+          - DeleteRecordingsFromDivision
+          - DeleteRecordingsFromQueue
+          - DeleteRecordingsPerUser
+          - UpdateQueues
+          - CreateSkills
+          - DeleteSkills
+          - CreateWrapUpCodes
+          - AssignWrapUpCodes
+          - GDPR_DeleteUser
+          - IntegrationAssignGroup
+          - ActivateUsersQueues
+          - DeactivateUsersQueues
+          - ListUsersPerDivision
+          - ListUsersPerGroup
+          - ListUsersPerQueue
+          - ChangePhoneSite
+      backup:
+        description: "Run Backup.sh before deploying the selected script"
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  validate:
+    name: Validate CSV Input
+    runs-on: ubuntu-latest
+    container:
+      image: sienikam/gccli:csvlint
+    outputs:
+      csv_file: ${{ steps.resolve-csv.outputs.csv_file }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Resolve CSV file for selected script
+        id: resolve-csv
+        run: |
+          case "${{ inputs.script }}" in
+            UpdateQueues)
+              csv_file="CreateQueues.csv"
+              ;;
+            IntegrationAssignGroup)
+              csv_file="IntegrationAssignGroups.csv"
+              ;;
+            DeleteAllExternalContacts)
+              csv_file=""
+              ;;
+            *)
+              csv_file="${{ inputs.script }}.csv"
+              ;;
+          esac
+
+          echo "csv_file=$csv_file" >> "$GITHUB_OUTPUT"
+
+          if [[ -n "$csv_file" ]]; then
+            echo "Selected CSV: $csv_file"
+          else
+            echo "Selected script does not require CSV validation."
+          fi
+
+      - name: Validate CSV with csvlint
+        if: ${{ steps.resolve-csv.outputs.csv_file != '' }}
+        run: |
+          csv_file="${{ steps.resolve-csv.outputs.csv_file }}"
+
+          if [[ ! -f "$csv_file" ]]; then
+            echo "Expected CSV file not found: $csv_file" >&2
+            exit 1
+          fi
+
+          csvlint -lazyquotes -delimiter=';' "$csv_file"
+
+  backup:
+    name: Backup Org Data
+    if: ${{ inputs.backup }}
+    needs: validate
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.target_org }}
+    container:
+      image: sienikam/gccli:csvlint
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Verify required environment configuration
+        env:
+          oauthclient_id: ${{ secrets.OAUTHCLIENT_ID }}
+          oauthclient_secret: ${{ secrets.OAUTHCLIENT_SECRET }}
+          environment: ${{ vars.GENESYS_CLOUD_ENVIRONMENT }}
+        run: |
+          [[ -n "$oauthclient_id" ]] || { echo "Missing OAUTHCLIENT_ID secret" >&2; exit 1; }
+          [[ -n "$oauthclient_secret" ]] || { echo "Missing OAUTHCLIENT_SECRET secret" >&2; exit 1; }
+          [[ -n "$environment" ]] || { echo "Missing GENESYS_CLOUD_ENVIRONMENT variable" >&2; exit 1; }
+
+      - name: Run backup
+        env:
+          oauthclient_id: ${{ secrets.OAUTHCLIENT_ID }}
+          oauthclient_secret: ${{ secrets.OAUTHCLIENT_SECRET }}
+          environment: ${{ vars.GENESYS_CLOUD_ENVIRONMENT }}
+        run: bash Backup.sh
+
+      - name: Upload backup artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: backup-${{ inputs.target_org }}-${{ github.run_number }}
+          path: "*.txt"
+          if-no-files-found: ignore
+
+  deploy:
+    name: Deploy Selected Script
+    needs:
+      - validate
+      - backup
+    if: ${{ always() && needs.validate.result == 'success' && (needs.backup.result == 'success' || needs.backup.result == 'skipped') }}
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.target_org }}
+    container:
+      image: sienikam/gccli:csvlint
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Verify required environment configuration
+        env:
+          oauthclient_id: ${{ secrets.OAUTHCLIENT_ID }}
+          oauthclient_secret: ${{ secrets.OAUTHCLIENT_SECRET }}
+          environment: ${{ vars.GENESYS_CLOUD_ENVIRONMENT }}
+        run: |
+          [[ -n "$oauthclient_id" ]] || { echo "Missing OAUTHCLIENT_ID secret" >&2; exit 1; }
+          [[ -n "$oauthclient_secret" ]] || { echo "Missing OAUTHCLIENT_SECRET secret" >&2; exit 1; }
+          [[ -n "$environment" ]] || { echo "Missing GENESYS_CLOUD_ENVIRONMENT variable" >&2; exit 1; }
+
+      - name: Run selected script
+        env:
+          oauthclient_id: ${{ secrets.OAUTHCLIENT_ID }}
+          oauthclient_secret: ${{ secrets.OAUTHCLIENT_SECRET }}
+          environment: ${{ vars.GENESYS_CLOUD_ENVIRONMENT }}
+        run: bash "${{ inputs.script }}.sh"
+
+      - name: Upload generated report artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: reports-${{ inputs.script }}-${{ github.run_number }}
+          path: |
+            UsersPerDivision.csv
+            UsersPerGroup.csv
+            UsersPerQueue.csv
+          if-no-files-found: ignore

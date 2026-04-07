@@ -1,0 +1,3 @@
+user;queues
+agent1@example.com;QueueName_1,QueueName_2
+agent2@example.com;QueueName_1
