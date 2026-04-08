@@ -74,7 +74,7 @@ jobs:
       csv_file: ${{ steps.resolve-csv.outputs.csv_file }}
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Resolve CSV file for selected script
         id: resolve-csv
@@ -124,7 +124,7 @@ jobs:
       image: sienikam/gccli:csvlint
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Verify required environment configuration
         env:
@@ -144,7 +144,7 @@ jobs:
         run: bash Backup.sh
 
       - name: Upload backup artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: backup-${{ inputs.target_org }}-${{ github.run_number }}
           path: "*.txt"
@@ -162,7 +162,7 @@ jobs:
       image: sienikam/gccli:csvlint
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Verify required environment configuration
         env:
@@ -182,7 +182,7 @@ jobs:
         run: bash "${{ inputs.script }}.sh"
 
       - name: Upload generated report artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: reports-${{ inputs.script }}-${{ github.run_number }}
           path: |
