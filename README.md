@@ -12,6 +12,12 @@ Most operations follow a simple pattern:
 
 This repository currently supports both GitLab CI/CD and GitHub Actions for running the Genesys Cloud automation scripts.
 
+## Demo
+
+A walkthrough of the project is available on YouTube. Click the thumbnail below to watch:
+
+[![Genesys Cloud Scripts demo](https://img.youtube.com/vi/jmk6xwDA6oI/maxresdefault.jpg)](https://www.youtube.com/watch?v=jmk6xwDA6oI)
+
 ## GitLab CI/CD
 
 GitLab pipeline is available in `.gitlab-ci.yml`.
