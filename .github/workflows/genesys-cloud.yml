@@ -50,6 +50,7 @@ on:
           - ListUsersPerDivision
           - ListUsersPerGroup
           - ListUsersPerQueue
+          - ExportUsers
           - ChangePhoneSite
       backup:
         description: "Run Backup.sh before deploying the selected script"
@@ -86,7 +87,7 @@ jobs:
             IntegrationAssignGroup)
               csv_file="IntegrationAssignGroups.csv"
               ;;
-            DeleteAllExternalContacts)
+            DeleteAllExternalContacts | ExportUsers)
               csv_file=""
               ;;
             *)
@@ -189,4 +190,5 @@ jobs:
             UsersPerDivision.csv
             UsersPerGroup.csv
             UsersPerQueue.csv
+            UsersExport.csv
           if-no-files-found: ignore

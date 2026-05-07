@@ -48,6 +48,7 @@ variables:
       - "ListUsersPerDivision"
       - "ListUsersPerGroup"
       - "ListUsersPerQueue"
+      - "ExportUsers"
       - "ChangePhoneSite"
     description: "Available Genesys Cloud scripts"
   backup:
@@ -91,5 +92,6 @@ deploy:
       - "UsersPerDivision.csv"
       - "UsersPerGroup.csv"
       - "UsersPerQueue.csv"
+      - "UsersExport.csv"
   only:
    - web
